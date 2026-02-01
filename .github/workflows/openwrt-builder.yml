@@ -40,9 +40,6 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-
     - name: Check Server Performance
       run: |
         echo "警告⚠"
@@ -76,6 +73,9 @@ jobs:
         swap-size-mb: 1024
         temp-reserve-mb: 100
         root-reserve-mb: 1024
+
+    - name: Checkout
+      uses: actions/checkout@v6
 
     - name: Clone source code
       run: |
