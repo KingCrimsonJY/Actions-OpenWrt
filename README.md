@@ -16,7 +16,7 @@
 - 云编译来源：https://github.com/P3TERX/Actions-OpenWrt
 
 ## 固件下载 [![](https://img.shields.io/badge/-编译状态及下载链接-FFFFFF.svg)](#固件下载-)
-点击下表中 [![](https://img.shields.io/badge/下载-链接-blueviolet.svg?style=flat&logo=hack-the-box)](https://github.com/haiibo/OpenWrt/releases) 即可跳转到该设备固件下载页面
+点击下表中 [![](https://img.shields.io/badge/下载-链接-blueviolet.svg?style=flat&logo=hack-the-box)](https://github.com/KingCrimsonJY/Actions-OpenWrt/releases) 即可跳转到该设备固件下载页面
 | 平台+设备名称 | 固件编译状态 | 配置文件 | 固件下载 |
 | :-------------: | :-------------: | :-------------: | :-------------: |
 | [![](https://img.shields.io/badge/IPQ60XX-WIFI-32C955.svg?logo=openwrt)](https://github.com/KingCrimsonJY/Actions-OpenWrt/blob/main/.github/workflows/openwrt-builder.yml) | [![](https://github.com/KingCrimsonJY/Actions-OpenWrt/actions/workflows/openwrt-builder.yml/badge.svg)](https://github.com/KingCrimsonJY/Actions-OpenWrt/actions/workflows/openwrt-builder.yml) | [![](https://img.shields.io/badge/编译-配置-orange.svg?logo=apache-spark)](https://github.com/KingCrimsonJY/Actions-OpenWrt/blob/main/.config) | [![](https://img.shields.io/badge/下载-链接-blueviolet.svg?logo=hack-the-box)](https://github.com/KingCrimsonJY/Actions-OpenWrt/releases) |
