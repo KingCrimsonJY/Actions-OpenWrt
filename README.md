@@ -1,26 +1,26 @@
-**English** | [中文](https://p3terx.com/archives/build-openwrt-with-github-actions.html)
+<img width="768" src="https://github.com/openwrt/openwrt/blob/main/include/logo.png"/>
 
-# Actions-OpenWrt
+# Actions-ImmortalWrt
 
 [![LICENSE](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square&label=LICENSE)](https://github.com/P3TERX/Actions-OpenWrt/blob/master/LICENSE)
-![GitHub Stars](https://img.shields.io/github/stars/P3TERX/Actions-OpenWrt.svg?style=flat-square&label=Stars&logo=github)
-![GitHub Forks](https://img.shields.io/github/forks/P3TERX/Actions-OpenWrt.svg?style=flat-square&label=Forks&logo=github)
 
-A template for building OpenWrt with GitHub Actions
+## 特别提示 [![](https://img.shields.io/badge/-个人免责声明-FFFFFF.svg)](#特别提示-)
 
-## Usage
+- **本人不对任何人因使用本固件所遭受的任何理论或实际的损失承担责任！**
 
-- Click the [Use this template](https://github.com/P3TERX/Actions-OpenWrt/generate) button to create a new repository.
-- Generate `.config` files using [Lean's OpenWrt](https://github.com/coolsnowwolf/lede) source code. ( You can change it through environment variables in the workflow file. )
-- Push `.config` file to the GitHub repository.
-- Select `Build OpenWrt` on the Actions page.
-- Click the `Run workflow` button.
-- When the build is complete, click the `Artifacts` button in the upper right corner of the Actions page to download the binaries.
+- **本固件禁止用于任何商业用途，请务必严格遵守国家互联网使用相关法律规定！**
 
-## Tips
+## 项目说明 [![](https://img.shields.io/badge/-项目基本介绍-FFFFFF.svg)](#项目说明-)
+- 固件默认管理地址：`192.168.2.1`或`immortalwrt.lan` 默认用户：`root` 默认密码：`none`
+- 源码：[immortalwrt](https://github.com/immortalwrt/immortalwrt)
+- 云编译来源：https://github.com/P3TERX/Actions-OpenWrt
 
-- It may take a long time to create a `.config` file and build the OpenWrt firmware. Thus, before create repository to build your own firmware, you may check out if others have already built it which meet your needs by simply [search `Actions-Openwrt` in GitHub](https://github.com/search?q=Actions-openwrt).
-- Add some meta info of your built firmware (such as firmware architecture and installed packages) to your repository introduction, this will save others' time.
+## 固件下载 [![](https://img.shields.io/badge/-编译状态及下载链接-FFFFFF.svg)](#固件下载-)
+点击下表中 [![](https://img.shields.io/badge/下载-链接-blueviolet.svg?style=flat&logo=hack-the-box)](https://github.com/haiibo/OpenWrt/releases) 即可跳转到该设备固件下载页面
+| 平台+设备名称 | 固件编译状态 | 配置文件 | 固件下载 |
+| :-------------: | :-------------: | :-------------: | :-------------: |
+| [![](https://img.shields.io/badge/IPQ60XX-WIFI-32C955.svg?logo=openwrt)](https://github.com/KingCrimsonJY/openwrt-ci/blob/main/.github/workflows/IPQ60XX-6.12-WIFI.yml) | [![](https://github.com/KingCrimsonJY/Actions-OpenWrt/actions/workflows/openwrt-builder.yml/badge.svg)](https://github.com/KingCrimsonJY/openwrt-ci/actions/workflows/IPQ60XX-6.12-WIFI.yml) | [![](https://img.shields.io/badge/编译-配置-orange.svg?logo=apache-spark)](https://github.com/KingCrimsonJY/Actions-OpenWrt/blob/main/.config) | [![](https://img.shields.io/badge/下载-链接-blueviolet.svg?logo=hack-the-box)](https://github.com/KingCrimsonJY/Actions-OpenWrt/releases) |
+
 
 ## Credits
 
@@ -37,3 +37,7 @@ A template for building OpenWrt with GitHub Actions
 ## License
 
 [MIT](https://github.com/P3TERX/Actions-OpenWrt/blob/main/LICENSE) © [**P3TERX**](https://p3terx.com)
+
+<a href="#readme">
+<img src="https://img.shields.io/badge/-返回顶部-FFFFFF.svg" title="返回顶部" align="right"/>
+</a>
