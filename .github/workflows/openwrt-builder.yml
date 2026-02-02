@@ -192,7 +192,7 @@ jobs:
           - ⚽ 源码: ${{ env.REPO_URL }}
           - 💝 分支: ${{ env.REPO_BRANCH }}
           - 🌐 地址: 192.168.2.1
-          - 🔑 密码: none
+          - 🔑 密码: 12345678
           ### 🧊 版本信息
           - 内核: ${{ env.VERSION_KERNEL }}
           - 编译时间: ${{ env.FILE_DATE }}

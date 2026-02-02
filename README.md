@@ -11,7 +11,7 @@
 - **本固件禁止用于任何商业用途，请务必严格遵守国家互联网使用相关法律规定！**
 
 ## 项目说明 [![](https://img.shields.io/badge/-项目基本介绍-FFFFFF.svg)](#项目说明-)
-- 固件默认管理地址：`192.168.2.1`或`immortalwrt.lan` 默认用户：`root` 默认密码：`none`
+- 固件默认管理地址：`192.168.2.1`或`immortalwrt.lan` 默认用户：`root` 默认密码：`12345678`
 - 源码：[immortalwrt](https://github.com/immortalwrt/immortalwrt)
 - 云编译来源：https://github.com/P3TERX/Actions-OpenWrt
 
