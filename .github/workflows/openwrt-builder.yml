@@ -88,33 +88,36 @@ jobs:
 
     - name: Generate variables
       run: |
-        cd openwrt
+        cp $CONFIG_FILE $OPENWRT_PATH/.config
+        cd $OPENWRT_PATH
+        make defconfig > /dev/null 2>&1
         SOURCE_REPO="$(echo $REPO_URL | awk -F '/' '{print $(NF)}')"
         echo "SOURCE_REPO=$SOURCE_REPO" >> $GITHUB_ENV
-        DEVICE_TARGET=$(grep -oP '^CONFIG_TARGET_\K[a-z0-9]+(?==y)' $GITHUB_WORKSPACE/.config | head -1) || true
-        [ -z "$DEVICE_TARGET" ] && DEVICE_TARGET="Unknown"
+        DEVICE_TARGET=$(cat .config | grep CONFIG_TARGET_BOARD | awk -F '"' '{print $2}')
         echo "DEVICE_TARGET=$DEVICE_TARGET" >> $GITHUB_ENV
-        echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+        DEVICE_SUBTARGET=$(cat .config | grep CONFIG_TARGET_SUBTARGET | awk -F '"' '{print $2}')
+        echo "DEVICE_SUBTARGET=$DEVICE_SUBTARGET" >> $GITHUB_ENV
+        echo "设备平台: $DEVICE_TARGET / $DEVICE_SUBTARGET"
 
     - name: Load custom feeds
       run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF $OPENWRT_PATH/feeds.conf.default
         chmod +x $GITHUB_WORKSPACE/$DIY_P1_SH
-        cd openwrt
+        cd $OPENWRT_PATH
         $GITHUB_WORKSPACE/$DIY_P1_SH
 
     - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
+      run: cd $OPENWRT_PATH && ./scripts/feeds update -a
 
     - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
+      run: cd $OPENWRT_PATH && ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        [ -e files ] && mv files $OPENWRT_PATH/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE $OPENWRT_PATH/.config
         chmod +x $GITHUB_WORKSPACE/$DIY_P2_SH
-        cd openwrt
+        cd $OPENWRT_PATH
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
     - name: SSH connection to Actions
@@ -124,7 +127,7 @@ jobs:
     - name: Download package
       id: package
       run: |
-        cd openwrt
+        cd $OPENWRT_PATH
         make defconfig
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
@@ -133,13 +136,12 @@ jobs:
     - name: Compile the firmware
       id: compile
       run: |
-        cd openwrt
+        cd $OPENWRT_PATH
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "status=success" >> $GITHUB_OUTPUT
-        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
-        [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
-        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+        echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+        echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
 
     - name: Check space usage
       if: (!cancelled())
@@ -149,53 +151,55 @@ jobs:
       uses: actions/upload-artifact@v6
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
-        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: openwrt/bin
+        name: ${{ env.SOURCE_REPO }}-bin-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-${{ env.FILE_DATE }}
+        path: ${{ env.OPENWRT_PATH }}/bin
 
     - name: Organize files
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
-        cd openwrt/bin/targets/*/*
-        rm -rf packages
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        cd $OPENWRT_PATH/bin/targets/*/*
+        cat sha256sums
         echo "VERSION_KERNEL=$(find -type f -name "*.manifest" -exec grep -oP '^kernel - \K.*?(?=~|-\d+-)' {} \;)" >> $GITHUB_ENV
+        cp $OPENWRT_PATH/.config build.config
+        rm -rf packages feeds.buildinfo version.buildinfo
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware directory
       uses: actions/upload-artifact@v6
-      if: steps.organize.outputs.status == 'success' && !cancelled()
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_RELEASE != 'true'
       with:
-        name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        name: ${{ env.SOURCE_REPO }}-firmware-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
     - name: Generate release tag
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+        echo "release_tag=${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}" >> $GITHUB_OUTPUT
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware to release
       uses: ncipollo/release-action@v1.20.0
       if: steps.compile.outputs.status == 'success' && steps.tag.outputs.status == 'success' && !cancelled()
       with:
-        name: ${{ steps.tag.outputs.release_tag }}
+        name: R${{ env.DATE }} for ${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}
         allowUpdates: true
         tag: ${{ steps.tag.outputs.release_tag }}
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ${{ env.FIRMWARE }}/*
         body: |
-          **This is OpenWrt Firmware for ${{ env.DEVICE_TARGET }}**
+          **This is OpenWrt Firmware for ${{ env.DEVICE_TARGET }}/${{ env.DEVICE_SUBTARGET }}**
           ### 📒 固件信息
-          - 💻 平台: ${{ env.DEVICE_TARGET }}
+          - 💻 平台: ${{ env.DEVICE_TARGET }}/${{ env.DEVICE_SUBTARGET }}
           - ⚽ 源码: ${{ env.REPO_URL }}
           - 💝 分支: ${{ env.REPO_BRANCH }}
           - 🌐 地址: 192.168.2.1
           - 🔑 密码: 12345678
           ### 🧊 版本信息
           - 内核: ${{ env.VERSION_KERNEL }}
-          - 编译时间: ${{ env.FILE_DATE }}
+          - 编译时间: ${{ env.DATE }}
           - 源码提交: ${{ env.VERSION_INFO }}
 
     - name: Delete workflow runs
