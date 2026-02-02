@@ -91,7 +91,7 @@ jobs:
         cd openwrt
         SOURCE_REPO="$(echo $REPO_URL | awk -F '/' '{print $(NF)}')"
         echo "SOURCE_REPO=$SOURCE_REPO" >> $GITHUB_ENV
-        DEVICE_TARGET=$(grep CONFIG_TARGET_BOARD $GITHUB_WORKSPACE/.config | awk -F '"' '{print $2}') || true
+        DEVICE_TARGET=$(grep -oP '^CONFIG_TARGET_\\K[a-z0-9]+(?==y)' $GITHUB_WORKSPACE/.config | head -1) || true
         [ -z "$DEVICE_TARGET" ] && DEVICE_TARGET="Unknown"
         echo "DEVICE_TARGET=$DEVICE_TARGET" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
